@@ -12,4 +12,6 @@ AHideAndSeekGameMode::AHideAndSeekGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	bUseSeamlessTravel = true;
 }

@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -90,6 +91,22 @@ void AHideAndSeekCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void AHideAndSeekCharacter::OnRep_Health()
+{
+	// Update UI or effects here
+}
+
+void AHideAndSeekCharacter::Server_SampleAction_Implementation()
+{
+	// Server-side implementation
+}
+
+void AHideAndSeekCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AHideAndSeekCharacter, Health);
 }
 
 void AHideAndSeekCharacter::Move(const FInputActionValue& Value)

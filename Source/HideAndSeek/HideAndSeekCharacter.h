@@ -46,7 +46,17 @@ class AHideAndSeekCharacter : public ACharacter
 
 public:
 	AHideAndSeekCharacter();
-	
+
+	// Replicated Variables 
+	UPROPERTY(ReplicatedUsing = OnRep_Health)
+	int Health;
+
+	// RPC for server
+	UFUNCTION(Server, Reliable)
+	void Server_SampleAction();
+
+	// Replication method
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 
@@ -55,13 +65,17 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
+
 
 protected:
 
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// Replication callback
+	UFUNCTION()
+	void OnRep_Health();
 
 public:
 	/** Returns CameraBoom subobject **/
