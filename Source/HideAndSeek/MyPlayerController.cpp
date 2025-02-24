@@ -29,10 +29,10 @@ void AMyPlayerController::SetupInputComponent()
 
 void AMyPlayerController::OnHostGame()
 {
-	//if(GetWorld())
-	//{
-	//	GetWorld()->ServerTravel("/Game/HideAndSeek/Levels/DivineInspirationMap?listen");
-	//}
+	if(GetWorld())
+	{
+		GetWorld()->ServerTravel("/Game/HideAndSeek/Levels/DivineInspirationMap?listen");
+	}
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Host Game Pressed!"));
@@ -41,7 +41,7 @@ void AMyPlayerController::OnHostGame()
 
 void AMyPlayerController::OnJoinGame()
 {
-	//ClientTravel("127.0.0.1", TRAVEL_Absolute);
+	ClientTravel("127.0.0.1", TRAVEL_Absolute);
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Join Game Pressed!"));
