@@ -66,6 +66,10 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	// The only difference is that the first uses the more modern trailing return type syntax,
+	// which explicitly specifies the return type after the function parameters.
+	//virtual auto Jump() -> void override; 
+	//virtual void Jump() override;
 
 protected:
 
@@ -77,10 +81,23 @@ protected:
 	UFUNCTION()
 	void OnRep_Health();
 
+	// Going to Bind to `MoveComp->OnReachedJumpApex`
+	UFUNCTION()
+	void HandleJumpApex();
+
+	virtual void Landed(const FHitResult& Hit) override;
+
+	virtual void BeginPlay() override;
+
+	float FixedDeltaTime = 1.0f / 5.0f;
+	float AccumulatedTime = 0.0f;
+	virtual void Tick(float DeltaTime) override;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
+
 

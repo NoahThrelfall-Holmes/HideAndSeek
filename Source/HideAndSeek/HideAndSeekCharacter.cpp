@@ -39,6 +39,7 @@ AHideAndSeekCharacter::AHideAndSeekCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+	GetCharacterMovement()->bNotifyApex = true; // Ensure apex notification is enabled
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -53,6 +54,63 @@ AHideAndSeekCharacter::AHideAndSeekCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void AHideAndSeekCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Get the movement component and bind the event
+	if (GetCharacterMovement()->bNotifyApex)
+	{
+		OnReachedJumpApex.AddDynamic(this, &AHideAndSeekCharacter::HandleJumpApex);
+	}
+}
+
+void AHideAndSeekCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	AccumulatedTime += DeltaTime;
+
+	// If enough time has passed for a **custom FixedUpdate**
+	while (AccumulatedTime >= FixedDeltaTime)
+	{
+		AccumulatedTime = 0.f;
+
+		UE_LOG(LogTemp, Log, TEXT("FixedUpdate: bNotifyApex = %hhu"), GetCharacterMovement()->bNotifyApex);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Custom misc
+
+void AHideAndSeekCharacter::OnRep_Health()
+{
+	// Update UI or effects here
+}
+
+void AHideAndSeekCharacter::HandleJumpApex()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Apex Reached!"));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Jump Apex Reached!"));
+}
+
+void AHideAndSeekCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	GetCharacterMovement()->bNotifyApex = true;
+}
+
+
+void AHideAndSeekCharacter::Server_SampleAction_Implementation()
+{
+	// Server-side implementation
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -91,16 +149,6 @@ void AHideAndSeekCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
-}
-
-void AHideAndSeekCharacter::OnRep_Health()
-{
-	// Update UI or effects here
-}
-
-void AHideAndSeekCharacter::Server_SampleAction_Implementation()
-{
-	// Server-side implementation
 }
 
 void AHideAndSeekCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -144,3 +192,5 @@ void AHideAndSeekCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+
