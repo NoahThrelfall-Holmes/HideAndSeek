@@ -5,7 +5,10 @@
 
 void UMultiplayerController::HostGame()
 {
-	GetWorld()->ServerTravel("/Game/Maps/YourMap?listen");
+	if (GetWorld())
+	{
+		GetWorld()->ServerTravel("/Game/HideAndSeek/Levels/DivineInspirationMap?listen");
+	}
 }
 
 void UMultiplayerController::JoinGame(const FString& Address)

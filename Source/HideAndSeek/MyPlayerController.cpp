@@ -4,6 +4,7 @@
 #include "MyPlayerController.h"
 
 #include "EnhancedInputComponent.h"
+#include "MultiplayerController.h"
 
 void AMyPlayerController::SetupInputComponent()
 {
@@ -29,21 +30,20 @@ void AMyPlayerController::SetupInputComponent()
 
 void AMyPlayerController::OnHostGame()
 {
-	if(GetWorld())
+	if(UMultiplayerController* GI = Cast<UMultiplayerController>(GetGameInstance()))
 	{
-		GetWorld()->ServerTravel("/Game/HideAndSeek/Levels/DivineInspirationMap?listen");
+		GI->HostGame();
 	}
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Host Game Pressed!"));
-	}
+	
+	UE_LOG(LogTemp, Log, TEXT("Host Game Pressed!"));
 }
 
 void AMyPlayerController::OnJoinGame()
 {
-	ClientTravel("127.0.0.1", TRAVEL_Absolute);
-	if (GEngine)
+	if(UMultiplayerController* GI = Cast<UMultiplayerController>(GetGameInstance()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Join Game Pressed!"));
+		GI->JoinGame("127.0.0.1");
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Join Game Pressed!"));
 }

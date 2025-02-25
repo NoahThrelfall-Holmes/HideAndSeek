@@ -78,7 +78,7 @@ void AHideAndSeekCharacter::Tick(float DeltaTime)
 	{
 		AccumulatedTime = 0.f;
 
-		UE_LOG(LogTemp, Log, TEXT("FixedUpdate: bNotifyApex = %hhu"), GetCharacterMovement()->bNotifyApex);
+		//UE_LOG(LogTemp, Log, TEXT("FixedUpdate: bNotifyApex = %hhu"), GetCharacterMovement()->bNotifyApex);
 	}
 }
 
@@ -92,12 +92,32 @@ void AHideAndSeekCharacter::OnRep_Health()
 
 void AHideAndSeekCharacter::HandleJumpApex()
 {
-	if (GEngine)
+	if (IsLocallyControlled())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Apex Reached!"));
-	}
+		ENetMode NetMode = GEngine->GetNetMode(GetWorld());
+		FString NetModeString;
 
-	UE_LOG(LogTemp, Warning, TEXT("Jump Apex Reached!"));
+		switch (NetMode)
+		{
+		case NM_Standalone:
+			NetModeString = TEXT("Standalone");
+			break;
+		case NM_ListenServer:
+			NetModeString = TEXT("ListenServer");
+			break;
+		case NM_DedicatedServer:
+			NetModeString = TEXT("DedicatedServer");
+			break;
+		case NM_Client:
+			NetModeString = TEXT("Client");
+			break;
+		default:
+			NetModeString = TEXT("Unknown");
+			break;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("[%s] Jump Apex Reached!"), *NetModeString);
+	}
 }
 
 void AHideAndSeekCharacter::Landed(const FHitResult& Hit)
@@ -111,6 +131,12 @@ void AHideAndSeekCharacter::Landed(const FHitResult& Hit)
 void AHideAndSeekCharacter::Server_SampleAction_Implementation()
 {
 	// Server-side implementation
+}
+
+void AHideAndSeekCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AHideAndSeekCharacter, Health);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -149,12 +175,6 @@ void AHideAndSeekCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
-}
-
-void AHideAndSeekCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AHideAndSeekCharacter, Health);
 }
 
 void AHideAndSeekCharacter::Move(const FInputActionValue& Value)
